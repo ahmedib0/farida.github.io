@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farida Ibrahim Portfolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    
+    
+    
+</head>
+<body>
+    
+    <div id="header">
+        <div class="container">
+            <nav>
+                <img src="Images/loggg.png" class="logo">
+        
+                <ul id="sidemenu">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#portfolio">Arts</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <i class="navbar" onclick="closemenu()"><img src="icons/x-solid.svg" style="width:30px;height:30px";  ></i>
+                </ul>
+                <i class="navbar" onclick="openmenu()"><img src="icons/list.png" style="width:30px;height:30px";; ></i>
+
+
+        
+            </nav>
+            <nav id="hamburger-nav">
+                <img src="Images/loggg.png" class="logo">
+                <div class="hamburger-menu">
+                    <div class="hamburger-icon" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    </div>
+                    <div class="menu-links">
+                        <li><a href="#" onclick="toggleMenu()">Home</a></li>
+                        <li><a href="#" onclick="toggleMenu()">Arts</a></li>
+                        <li><a href="#" onclick="toggleMenu()">About</a></li>
+                        <li><a href="#" onclick="toggleMenu()">Contact</a></li>
+                    </div>
+                </div>
+
+            </nav>
+            <div class="header-text">
+                <p>Visual Artist</p>
+                <h1>Hi, I'm <span>Farida</span> <br>Ibrahim From Egypt</h1>
+                </div>
+            </div>
+    </div>
+
+<!-- ---------------------portfolio------------------------ --> 
+    <div id="portfolio">
+        <div class="container">
+            <h1 class="sub-title"></h1>
+            <div class="work">
+            <section class="slider-wrapper">
+                <div class="slideshow-container fade">
+
+                    <!-- Full images with numbers and message Info -->
+                    <div class="Containers">
+                    <div class="MessageInfo">1 / 3</div>
+                    <img src="Images/w1.jpeg" style="width:100%">
+                    <div class="Info">Sold</div>
+                    </div>
+                
+                    <div class="Containers">
+                    <div class="MessageInfo">2 / 3</div>
+                    <img src="Images/w2.jpeg" style="width:100%">
+                    <div class="Info">Sold</div>
+                    </div>
+                
+                    <div class="Containers">
+                    <div class="MessageInfo">3 / 3</div>
+                    <img src="Images/f.jpeg" style="width:100%">
+                    <div class="Info">Available</div>
+                    </div>
+                
+                    <!-- Back and forward buttons -->
+                    <a class="Back" onclick="plusSlides(-1)">&#10094;</a>
+                    <a class="forward" onclick="plusSlides(1)">&#10095;</a>
+                </div>
+                <br>
+                
+                <!-- The circles/dots -->
+                <div style="text-align:center">
+                    <span class="dots" onclick="currentSlide(1)"></span>
+                    <span class="dots" onclick="currentSlide(2)"></span>
+                    <span class="dots" onclick="currentSlide(3)"></span>
+                </div> 
+            </section>
+            <div class="button2">
+                <button style="--clr:#39FF14"><span>See more</span><i></i></button>
+
+            </div>
+    </div>
+
+    <script src="java.js"></script>
+
+<!-- -------------------about-------------- -->
+    <div id="about">
+        <div class="container">
+            <div class="sub-title">
+                <div class="about-col-1">
+                    <img src="Images/IMG-5.png">
+                </div>
+                <div class="about-col-2">
+                    <h1 class="sub-title">About Me</h1>
+                    <p class="defn">Farida Ibrahim is a Cairo, Egypt-based artist. Born on October 28, 1996, and currently living in Egypt, 
+                        studied fine arts at Helwan University painting department. She participated in 15 group exhibitions in different cities around Egypt.
+                        She also participated in recycling projects for sustainable art and human development initiatives
+                        and volunteered as an art trainer for orphan children organized by the Ministry of Youth and Sports. </p>
+                        <div class="tab-titles">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- ----------------contact us-------------------------------- -->
+    <div id="contact">
+        <div class="sub-title">
+            <div class="contact-left">
+                <h1 class="sub-title">Contact Me</h1>
+                <p><img src="icons/icons8-email-48.png" style="width:42px;height:42px"; ></p>
+                <p class="infoo">faridaibrahim818@outlook.com</p>
+                <p><img src="icons/icons8-phone-number-48.png"style="width:42px;height:42px";  ></p>
+                <p class="infoo">01012523893</p>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/farida.ibrahem.800" target="_blank"><img  src="icons/icons8-facebook-48.png" style="width:48px;height:48px";></a>
+                    <a href="https://www.instagram.com/farida_ibrahim10/?hl=en"target="_blank"><img src="icons/icons8-instagram-48.png" style="width:48px;height:48px;"></a>
+                    <a href="https://www.linkedin.com/in/farida-ibrahim-7887ba235/"target="_blank"><img src="icons/icons8-linkedin-48.png" style="width:48px;height:48px;"></a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

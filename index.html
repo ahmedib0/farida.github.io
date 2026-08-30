@@ -60,26 +60,29 @@
     .hero-art { position: relative; min-height: 480px; }
     .hero-art::after { content: none; }
     @keyframes heroMainFloat { 0%, 100% { transform: rotate(2deg) translate3d(0, 0, 0); } 50% { transform: rotate(4deg) translate3d(5px, -12px, 0); } }
-    @keyframes heroSideDropOff { 0%, 18% { opacity: 1; transform: translate3d(0, 0, 0) rotate(-8deg); } 27% { transform: translate3d(0, 5px, 0) rotate(-5deg); } 100% { opacity: 0; transform: translate3d(0, 460px, 0) rotate(25deg); } }
+    @keyframes heroSideDropOff { 0% { opacity: 1; transform: translate3d(0, 0, 0) rotate(-8deg); } 30% { opacity: .96; transform: translate3d(0, 118px, 0) rotate(2deg); } 100% { opacity: 0; transform: translate3d(0, 460px, 0) rotate(25deg); } }
     @keyframes heroSideFloat { 0%, 100% { transform: rotate(-8deg) translate3d(0, 0, 0); } 50% { transform: rotate(-5deg) translate3d(-7px, -9px, 0); } }
     @keyframes tapeSway { 0%, 100% { transform: rotate(-4deg) translateX(0); } 50% { transform: rotate(2deg) translateX(4px); } }
     .tape { position: absolute; width: 92px; height: 27px; top: -15px; left: 43%; background: rgba(212,166,58,.66); transform: rotate(-4deg); z-index: 2; animation: tapeSway 5s ease-in-out infinite; }
     .art-main { position: absolute; width: 73%; height: 440px; right: 5%; top: 8px; object-fit: cover; padding: 12px; background: #fbf5e8; box-shadow: var(--shadow); transform: rotate(2deg); animation: heroMainFloat 7s ease-in-out infinite; }
-    .art-side { position: absolute; width: 31%; height: 230px; left: 0; bottom: 10px; object-fit: cover; padding: 9px; background: #fbf5e8; box-shadow: var(--shadow); transform: rotate(-8deg); animation: heroSideDropOff 2.2s 1.8s cubic-bezier(.7,0,1,.6) both; }
+    .side-art-card { position: absolute; width: 31%; height: 230px; left: 0; bottom: 10px; transform: rotate(-8deg); animation: none; }
+    .art-side { display: block; position: relative; width: 100%; height: 100%; object-fit: cover; padding: 9px; background: #fbf5e8; box-shadow: var(--shadow); }
+    .sold-stamp { position: absolute; right: -22px; top: 18px; z-index: 2; padding: 8px 11px; background: var(--terracotta); color: #fbf5e8; box-shadow: 4px 4px 0 rgba(32,37,34,.2); font: 700 9px Arial, sans-serif; letter-spacing: .12em; transform: rotate(10deg); white-space: nowrap; }
+    .hero-art.is-visible .side-art-card { animation: heroSideDropOff 1.1s cubic-bezier(.42,0,1,1) both; }
     .scribble { position: absolute; width: 92px; height: 35px; right: -11px; top: 100px; border-top: 1px solid var(--terracotta); border-bottom: 1px solid var(--terracotta); transform: rotate(17deg); opacity: .8; }
     .section-head { display: flex; justify-content: space-between; gap: 20px; align-items: end; padding: 0 0 26px; border-bottom: 1px solid var(--line); }
     .section-head h2 { margin-top: 12px; font: 500 clamp(38px, 5vw, 66px)/.95 Georgia, serif; letter-spacing: -.06em; }
     .section-head p { max-width: 250px; color: var(--muted); font: 15px/1.45 Georgia, serif; }
     .works { padding: 86px 0; }
-    .filters { display: flex; gap: 8px; padding: 20px 0 14px; flex-wrap: wrap; }
-    .filter { border: 1px solid var(--line); border-radius: 100px; background: transparent; padding: 9px 15px; color: var(--muted); font: 11px Arial; cursor: pointer; }
+    .filters { position: relative; z-index: 2; display: flex; gap: 8px; padding: 20px 0 14px; flex-wrap: wrap; }
+    .filter { position: relative; z-index: 1; border: 1px solid var(--line); border-radius: 100px; background: transparent; padding: 9px 15px; color: var(--muted); font: 11px Arial; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     .filter.active, .filter:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
     .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 48px 24px; }
     .card { grid-column: span 4; position: relative; cursor: pointer; }
-    .card:nth-child(2) { margin-top: 74px; }
+    .card:nth-child(2) { margin-top: 0; }
     .card:nth-child(3) { grid-column: span 4; }
-    .card:nth-child(4) { grid-column: 3 / span 4; margin-top: 14px; }
-    .card:nth-child(5) { grid-column: 8 / span 4; margin-top: -48px; }
+    .card:nth-child(4) { grid-column: span 4; margin-top: 0; }
+    .card:nth-child(5) { grid-column: span 4; margin-top: 0; }
     .card-image { aspect-ratio: 4/5; width: 100%; object-fit: cover; padding: 10px; background: #fbf5e8; box-shadow: 8px 12px 0 rgba(82,110,120,.15); transition: transform .35s ease, box-shadow .35s ease; }
     .card:nth-child(even) .card-image { box-shadow: -8px 12px 0 rgba(182,87,67,.17); }
     .card:hover .card-image { transform: translateY(-7px) rotate(-1deg); box-shadow: 13px 19px 0 rgba(82,110,120,.2); }
@@ -90,8 +93,8 @@
     .status { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 6px 9px; border: 1px solid #4d6e62; border-radius: 999px; background: #dfe9dc; color: #315347; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
     .status i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
     .status.sold { border-color: #8c8173; background: #e0d9ce; color: #756b5e; }
-    .availability-key { display: grid; grid-template-columns: max-content max-content max-content; align-items: center; justify-content: start; gap: 10px 32px; color: var(--muted); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 0 0 36px; }
-    .availability-key span { display: inline-flex; gap: 7px; align-items: center; }
+    .availability-key { display: grid; grid-template-columns: max-content max-content max-content; align-items: center; justify-content: start; gap: 10px 32px; color: var(--muted); font-size: 10px; line-height: 1; letter-spacing: .1em; text-transform: uppercase; padding: 0 0 36px; }
+    .availability-key span { display: inline-flex; align-items: center; gap: 7px; min-height: 20px; white-space: nowrap; }
     .availability-key i { width: 8px; height: 8px; border-radius: 50%; background: #4d6e62; }
     .availability-key .sold-dot { background: #8c8173; }
     .about { border-top: 1px solid var(--line); padding: 92px 0; display: grid; grid-template-columns: .82fr .62fr 1fr; gap: 8%; align-items: start; }
@@ -110,7 +113,7 @@
     .contact-links { display: flex; flex-direction: column; gap: 13px; min-width: 200px; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; }
     .contact-links a { border-bottom: 1px solid var(--line); padding-bottom: 10px; }
     .contact-links a:hover { color: var(--terracotta); }
-    .archive-note { margin: 0; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .archive-note { margin: 0; color: var(--muted); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; } }
     footer { border-top: 1px solid var(--line); padding: 20px 0 30px; display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
     dialog { width: min(720px, calc(100% - 32px)); border: none; padding: 0; background: var(--paper); color: var(--ink); box-shadow: 0 30px 100px rgba(0,0,0,.35); }
@@ -128,8 +131,10 @@
       .hero { display: block; padding: 64px 0 80px; }
       h1 { font-size: clamp(56px, 17vw, 86px); }
       .hero-art { min-height: 390px; margin-top: 55px; }
-      .art-main { height: 350px; width: 76%; }
-      .art-side { height: 190px; }
+      .art-main { height: 350px; width: 76%; animation: none; }
+      .side-art-card { height: 190px; }
+      .art-side { height: 100%; }
+      .hero-art.is-visible .art-main { animation: heroMainFloat 7s ease-in-out infinite; }
       .hero-art::after { right: 0; bottom: -6px; }
       .section-head, .contact { display: block; }
       .section-head p { margin-top: 18px; }
@@ -159,20 +164,20 @@
     <section class="hero wrap">
       <div class="hero-copy">
         <div class="eyebrow">Artist / Mokattam, Cairo</div>
-        <h1>A city, held in colour.</h1>
+        <h1>Where colour takes shape.</h1>
         <p>Paintings, drawings, and experiments by Farida Ibrahim — an evolving record of memory, material, and everyday life in Egypt.</p>
         <div class="hero-actions"><a class="button primary" href="#works">Explore the works <span style="margin-left:12px">↘</span></a></div>
       </div>
       <div class="hero-art" aria-label="Featured artwork preview">
         <div class="tape"></div><div class="scribble"></div>
         <img class="art-main" src="https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=1000&q=85" alt="Abstract painting in warm colors" />
-        <img class="art-side" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=600&q=85" alt="Abstract artwork detail" />
+        <div class="side-art-card"><img class="art-side" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=600&q=85" alt="Sold abstract artwork preview" /><span class="sold-stamp">SOLD — ARCHIVE</span></div>
       </div>
     </section>
 
     <section class="works wrap" id="works">
-      <div class="section-head"><div><div class="eyebrow">Selected works</div><h2>An archive of looking twice.</h2></div></div>
-      <div class="filters" role="group" aria-label="Filter portfolio works"><button class="filter active" data-filter="all">All works</button><button class="filter" data-filter="available">Available</button><button class="filter" data-filter="sold">Sold</button></div>
+      <div class="section-head"><div><div class="eyebrow">Selected works</div><h2>See what the colour is saying.</h2></div></div>
+      <div class="filters" role="group" aria-label="Filter portfolio works"><button type="button" class="filter active" data-filter="all" aria-pressed="true">All works</button><button type="button" class="filter" data-filter="available" aria-pressed="false">Available</button><button type="button" class="filter" data-filter="sold" aria-pressed="false">Sold</button></div>
       <div class="availability-key" aria-label="Availability legend"><span><i></i> Available — inquire</span><span><i class="sold-dot"></i> Sold — archive</span><span class="archive-note">5 works / 4 available</span></div>
       <div class="grid">
         <article class="card" tabindex="0" role="button" data-type="painting" data-availability="available" data-title="After the Call to Prayer" data-meta="2026 · Acrylic & charcoal · 80 × 100 cm" data-price="EGP 32,000" data-status="AVAILABLE · INQUIRE" data-description="A slow study in blue hour, made after the city quiets. The surface holds scraped pigment, graphite, and a single terracotta mark."><img class="card-image" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=900&q=85" alt="After the Call to Prayer abstract artwork"/><div class="card-meta"><div><h3>After the Call<br/>to Prayer</h3><div class="details">2026 · acrylic & charcoal<br/>80 × 100 cm</div><span class="status available"><i></i>Available · inquire</span></div><span class="price">EGP 32,000</span></div></article>
@@ -184,12 +189,12 @@
     </section>
 
     <section class="about wrap" id="about">
-      <div><div class="eyebrow">About the artist / Mokattam, Cairo</div><h2>A practice built from looking twice.</h2></div>
+      <div><div class="eyebrow">About the artist / Mokattam, Cairo</div><h2>Meet the artist behind the marks.</h2></div>
       <figure class="about-portrait"><img src="farida-portrait.jpg" alt="Portrait of Farida Ibrahim" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"/><div class="portrait-placeholder" style="display:none">Farida Ibrahim<br/>portrait</div><figcaption>Farida / in front of one of her works</figcaption></figure>
       <div class="about-copy"><p>Farida Ibrahim is a Cairo, Egypt-based artist. Born on October 28, 1996, she studied fine arts in the painting department at Helwan University.</p><p>Farida has participated in 15 group exhibitions in different cities across Egypt. She has also taken part in recycling projects for sustainable art and human development initiatives, and volunteered as an art trainer for orphan children through the Ministry of Youth and Sports.</p><p style="color:var(--terracotta); font-style:italic;">Every work begins with looking. Some observations become places.</p></div>
     </section>
 
-    <section class="contact wrap" id="contact"><div><div class="eyebrow">Portfolio inquiries / Cairo, Egypt</div><h2>Let’s find the right work for your wall.</h2></div><div class="contact-links"><a class="contact-link" href="mailto:farida.ibrahim.art@example.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5"></rect><path d="m4 7 8 6 8-6"></path></svg>Email Farida ↗</a><a class="contact-link" href="https://instagram.com/farida_ibrahim10" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"></rect><circle cx="12" cy="12" r="3.5"></circle><circle cx="17.3" cy="6.8" r=".8" fill="currentColor" stroke="none"></circle></svg>@farida_ibrahim10 ↗</a><a class="contact-link" href="https://wa.me/201123795600" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-11.7 7.1L4 20l1.5-4.1A8 8 0 1 1 20 11.5Z"></path><path d="M9 8.5c.2 1.8 2.5 4.3 4.5 5.1.7.3 1.2-.1 1.7-.8l.5-.7-1.9-1.2-.8.9c-.8-.3-1.7-1.2-2.1-2l.8-.8-1.1-1.8-.7.2c-.6.2-.9.6-.9 1.1Z"></path></svg>WhatsApp · 011 237 95600 ↗</a></div></section>
+    <section class="contact wrap" id="contact"><div><div class="eyebrow">Portfolio inquiries / Cairo, Egypt</div><h2>Find the piece that feels like yours.</h2></div><div class="contact-links"><a class="contact-link" href="mailto:farida.ibrahim.art@example.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5"></rect><path d="m4 7 8 6 8-6"></path></svg>Email Farida ↗</a><a class="contact-link" href="https://instagram.com/farida_ibrahim10" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"></rect><circle cx="12" cy="12" r="3.5"></circle><circle cx="17.3" cy="6.8" r=".8" fill="currentColor" stroke="none"></circle></svg>@farida_ibrahim10 ↗</a><a class="contact-link" href="https://wa.me/201123795600" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-11.7 7.1L4 20l1.5-4.1A8 8 0 1 1 20 11.5Z"></path><path d="M9 8.5c.2 1.8 2.5 4.3 4.5 5.1.7.3 1.2-.1 1.7-.8l.5-.7-1.9-1.2-.8.9c-.8-.3-1.7-1.2-2.1-2l.8-.8-1.1-1.8-.7.2c-.6.2-.9.6-.9 1.1Z"></path></svg>WhatsApp · 011 237 95600 ↗</a></div></section>
   </main>
   <footer class="wrap"><span>© 2026 Farida Ibrahim</span><span>Portfolio / Made in Cairo</span></footer>
 
@@ -197,6 +202,39 @@
   <script>
     const dialog = document.querySelector('#workDialog');
     const cards = [...document.querySelectorAll('.card')];
+    const heroArt = document.querySelector('.hero-art');
+    if (heroArt) {
+      let hasScrolled = false;
+      let heroAnimationStarted = false;
+      let activationTimer;
+      const heroStartDelay = window.matchMedia('(max-width: 760px)').matches ? 450 : 0;
+      const activateHeroAnimation = () => {
+        if (!hasScrolled || heroAnimationStarted) return;
+        const bounds = heroArt.getBoundingClientRect();
+        if (bounds.top < window.innerHeight && bounds.bottom > 0) {
+          heroArt.classList.add('is-visible');
+          heroAnimationStarted = true;
+          heroObserver.disconnect();
+        }
+      };
+      const heroObserver = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting) && hasScrolled) {
+          clearTimeout(activationTimer);
+          activationTimer = setTimeout(activateHeroAnimation, heroStartDelay);
+        } else {
+          clearTimeout(activationTimer);
+        }
+      }, { threshold: 0.2 });
+      heroObserver.observe(heroArt);
+      const scheduleHeroAnimation = () => {
+        hasScrolled = true;
+        clearTimeout(activationTimer);
+        activationTimer = setTimeout(activateHeroAnimation, heroStartDelay);
+      };
+      window.addEventListener('scroll', scheduleHeroAnimation, { passive: true });
+      window.addEventListener('wheel', scheduleHeroAnimation, { passive: true });
+      window.addEventListener('touchmove', scheduleHeroAnimation, { passive: true });
+    }
     const openCard = card => {
       document.querySelector('#modalImage').src = card.querySelector('img').src;
       document.querySelector('#modalImage').alt = card.querySelector('img').alt;
@@ -211,10 +249,34 @@
     cards.forEach(card => { card.addEventListener('click', () => openCard(card)); card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openCard(card); } }); });
     document.querySelector('.close').addEventListener('click', () => dialog.close());
     dialog.addEventListener('click', e => { if (e.target === dialog) dialog.close(); });
-    document.querySelectorAll('.filter').forEach(button => button.addEventListener('click', () => {
-      document.querySelectorAll('.filter').forEach(b => b.classList.remove('active')); button.classList.add('active');
-      cards.forEach(card => { const filter = button.dataset.filter; const matches = filter === 'all' || card.dataset.type === filter || card.dataset.availability === filter; card.style.display = matches ? '' : 'none'; });
-    }));
+    const filters = document.querySelector('.filters');
+    const filterButtons = [...document.querySelectorAll('.filter')];
+    const applyFilter = button => {
+      if (!button) return;
+      const filter = button.dataset.filter;
+      filterButtons.forEach(b => {
+        const selected = b === button;
+        b.classList.toggle('active', selected);
+        b.setAttribute('aria-pressed', String(selected));
+      });
+      cards.forEach(card => {
+        const matches = filter === 'all' || card.dataset.type === filter || card.dataset.availability === filter;
+        card.hidden = !matches;
+      });
+    };
+    filters.addEventListener('pointerup', event => {
+      const button = event.target.closest('.filter');
+      if (!button) return;
+      event.preventDefault();
+      applyFilter(button);
+      button.focus({ preventScroll: true });
+    });
+    filters.addEventListener('click', event => {
+      const button = event.target.closest('.filter');
+      if (!button || event.detail !== 0) return;
+      event.preventDefault();
+      applyFilter(button);
+    });
   </script>
 </body>
 </html>

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Farida Ibrahim — Portfolio</title>
+  <meta name="description" content="The portfolio of Cairo-based artist Farida Ibrahim." />
+  <style>
+    :root {
+      --paper: #f2eadb;
+      --paper-deep: #e6d7be;
+      --ink: #202522;
+      --muted: #736f63;
+      --terracotta: #b65743;
+      --saffron: #d4a63a;
+      --blue: #526e78;
+      --line: rgba(32, 37, 34, .18);
+      --shadow: 0 24px 65px rgba(54, 45, 30, .14);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Arial, Helvetica, sans-serif;
+      background-image: radial-gradient(rgba(53,45,31,.06) .6px, transparent .6px);
+      background-size: 7px 7px;
+    }
+    body::before {
+      content: "";
+      position: fixed; inset: 0; pointer-events: none; opacity: .16; z-index: 10;
+      background: repeating-linear-gradient(0deg, transparent 0 5px, rgba(98,77,48,.06) 6px 7px);
+      mix-blend-mode: multiply;
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { width: min(1180px, calc(100% - 48px)); margin: auto; }
+    header {
+      height: 76px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--line); position: relative; z-index: 2;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-family: Georgia, serif; font-size: 21px; letter-spacing: -.04em; }
+    .brand-mark { width: 29px; height: 29px; border: 0; border-radius: 50%; display: grid; place-items: center; overflow: hidden; background: transparent; }
+    .brand-mark { position: relative; }
+    .brand-mark img { position: absolute; left: 50%; top: 130%; width: 130px; height: 184px; max-width: none; object-fit: fill; transform: translate(-50%, -50%); mix-blend-mode: multiply; }
+    nav { display: flex; gap: 28px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; }
+    nav a:hover { color: var(--terracotta); }
+    .eyebrow { color: var(--terracotta); font-size: 11px; text-transform: uppercase; letter-spacing: .18em; font-weight: 700; }
+    .hero { min-height: 650px; display: grid; grid-template-columns: .9fr 1.1fr; gap: 10%; align-items: center; padding: 78px 0 92px; }
+    .hero-copy { position: relative; }
+    .hero-copy::before { content: "01"; position: absolute; top: -47px; left: -3px; color: var(--saffron); font: italic 13px Georgia, serif; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { margin: 23px 0 27px; max-width: 580px; font: 500 clamp(54px, 7vw, 100px)/.91 Georgia, serif; letter-spacing: -.075em; }
+    .hero-copy > p { max-width: 370px; color: var(--muted); font: 18px/1.55 Georgia, serif; }
+    .hero-actions { display: flex; gap: 14px; align-items: center; margin-top: 40px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 21px; border: 1px solid var(--ink); text-transform: uppercase; letter-spacing: .14em; font-size: 10px; transition: .25s ease; }
+    .button.primary { background: var(--ink); color: var(--paper); }
+    .button:hover { transform: translateY(-3px); box-shadow: 4px 4px 0 var(--terracotta); }
+    .hero-note { margin-left: 5px; color: var(--muted); font: italic 15px Georgia, serif; transform: rotate(-5deg); }
+    .hero-art { position: relative; min-height: 480px; }
+    .hero-art::after { content: none; }
+    @keyframes heroMainFloat { 0%, 100% { transform: rotate(2deg) translate3d(0, 0, 0); } 50% { transform: rotate(4deg) translate3d(5px, -12px, 0); } }
+    @keyframes heroSideDropOff { 0%, 18% { opacity: 1; transform: translate3d(0, 0, 0) rotate(-8deg); } 27% { transform: translate3d(0, 5px, 0) rotate(-5deg); } 100% { opacity: 0; transform: translate3d(0, 460px, 0) rotate(25deg); } }
+    @keyframes heroSideFloat { 0%, 100% { transform: rotate(-8deg) translate3d(0, 0, 0); } 50% { transform: rotate(-5deg) translate3d(-7px, -9px, 0); } }
+    @keyframes tapeSway { 0%, 100% { transform: rotate(-4deg) translateX(0); } 50% { transform: rotate(2deg) translateX(4px); } }
+    .tape { position: absolute; width: 92px; height: 27px; top: -15px; left: 43%; background: rgba(212,166,58,.66); transform: rotate(-4deg); z-index: 2; animation: tapeSway 5s ease-in-out infinite; }
+    .art-main { position: absolute; width: 73%; height: 440px; right: 5%; top: 8px; object-fit: cover; padding: 12px; background: #fbf5e8; box-shadow: var(--shadow); transform: rotate(2deg); animation: heroMainFloat 7s ease-in-out infinite; }
+    .art-side { position: absolute; width: 31%; height: 230px; left: 0; bottom: 10px; object-fit: cover; padding: 9px; background: #fbf5e8; box-shadow: var(--shadow); transform: rotate(-8deg); animation: heroSideDropOff 2.2s 1.8s cubic-bezier(.7,0,1,.6) both; }
+    .scribble { position: absolute; width: 92px; height: 35px; right: -11px; top: 100px; border-top: 1px solid var(--terracotta); border-bottom: 1px solid var(--terracotta); transform: rotate(17deg); opacity: .8; }
+    .section-head { display: flex; justify-content: space-between; gap: 20px; align-items: end; padding: 0 0 26px; border-bottom: 1px solid var(--line); }
+    .section-head h2 { margin-top: 12px; font: 500 clamp(38px, 5vw, 66px)/.95 Georgia, serif; letter-spacing: -.06em; }
+    .section-head p { max-width: 250px; color: var(--muted); font: 15px/1.45 Georgia, serif; }
+    .works { padding: 86px 0; }
+    .filters { display: flex; gap: 8px; padding: 20px 0 14px; flex-wrap: wrap; }
+    .filter { border: 1px solid var(--line); border-radius: 100px; background: transparent; padding: 9px 15px; color: var(--muted); font: 11px Arial; cursor: pointer; }
+    .filter.active, .filter:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 48px 24px; }
+    .card { grid-column: span 4; position: relative; cursor: pointer; }
+    .card:nth-child(2) { margin-top: 74px; }
+    .card:nth-child(3) { grid-column: span 4; }
+    .card:nth-child(4) { grid-column: 3 / span 4; margin-top: 14px; }
+    .card:nth-child(5) { grid-column: 8 / span 4; margin-top: -48px; }
+    .card-image { aspect-ratio: 4/5; width: 100%; object-fit: cover; padding: 10px; background: #fbf5e8; box-shadow: 8px 12px 0 rgba(82,110,120,.15); transition: transform .35s ease, box-shadow .35s ease; }
+    .card:nth-child(even) .card-image { box-shadow: -8px 12px 0 rgba(182,87,67,.17); }
+    .card:hover .card-image { transform: translateY(-7px) rotate(-1deg); box-shadow: 13px 19px 0 rgba(82,110,120,.2); }
+    .card-meta { display: flex; justify-content: space-between; align-items: start; padding-top: 15px; }
+    .card h3 { font: 500 23px/1 Georgia, serif; letter-spacing: -.04em; }
+    .card .details { color: var(--muted); font-size: 11px; line-height: 1.6; text-transform: uppercase; letter-spacing: .08em; margin-top: 7px; }
+    .price { color: var(--terracotta); font: 15px Georgia, serif; white-space: nowrap; }
+    .status { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 6px 9px; border: 1px solid #4d6e62; border-radius: 999px; background: #dfe9dc; color: #315347; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .status i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .status.sold { border-color: #8c8173; background: #e0d9ce; color: #756b5e; }
+    .availability-key { display: grid; grid-template-columns: max-content max-content max-content; align-items: center; justify-content: start; gap: 10px 32px; color: var(--muted); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 0 0 36px; }
+    .availability-key span { display: inline-flex; gap: 7px; align-items: center; }
+    .availability-key i { width: 8px; height: 8px; border-radius: 50%; background: #4d6e62; }
+    .availability-key .sold-dot { background: #8c8173; }
+    .about { border-top: 1px solid var(--line); padding: 92px 0; display: grid; grid-template-columns: .82fr .62fr 1fr; gap: 8%; align-items: start; }
+    .about h2 { max-width: 430px; font: 500 clamp(37px, 5vw, 62px)/.96 Georgia, serif; letter-spacing: -.065em; }
+    .about-copy { color: var(--muted); font: 18px/1.65 Georgia, serif; max-width: 440px; }
+    .about-copy p + p { margin-top: 20px; }
+    .about-portrait { position: relative; max-width: 280px; margin: -18px auto 0; transform: rotate(3deg); }
+    .about-portrait::before { content: ""; position: absolute; width: 76px; height: 25px; top: -13px; left: 34%; background: rgba(212,166,58,.66); transform: rotate(-7deg); z-index: 1; }
+    .about-portrait img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 24%; padding: 11px; background: #fbf5e8; box-shadow: 11px 14px 0 rgba(182,87,67,.16), var(--shadow); filter: saturate(.78) sepia(.12) contrast(.96); }
+    .about-portrait figcaption { margin-top: 14px; color: var(--blue); font: italic 13px Georgia, serif; text-align: right; transform: rotate(-5deg); }
+    .portrait-placeholder { aspect-ratio: 4 / 5; display: grid; place-items: center; padding: 28px; background: linear-gradient(135deg, #d9c8a7, #b8c9c5); color: rgba(32,37,34,.7); text-align: center; font: italic 24px/1.1 Georgia, serif; }
+    .contact-link { display: flex; align-items: center; gap: 10px; }
+    .contact-link svg { width: 17px; height: 17px; flex: 0 0 auto; stroke: currentColor; fill: none; stroke-width: 1.7; }
+    .contact { padding: 78px 0 100px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: end; gap: 30px; }
+    .contact h2 { margin-top: 15px; max-width: 590px; font: 500 clamp(42px, 6vw, 78px)/.92 Georgia, serif; letter-spacing: -.075em; }
+    .contact-links { display: flex; flex-direction: column; gap: 13px; min-width: 200px; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; }
+    .contact-links a { border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+    .contact-links a:hover { color: var(--terracotta); }
+    .archive-note { margin: 0; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; } }
+    footer { border-top: 1px solid var(--line); padding: 20px 0 30px; display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+    dialog { width: min(720px, calc(100% - 32px)); border: none; padding: 0; background: var(--paper); color: var(--ink); box-shadow: 0 30px 100px rgba(0,0,0,.35); }
+    dialog::backdrop { background: rgba(32,37,34,.55); backdrop-filter: blur(3px); }
+    .modal { padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+    .modal img { width: 100%; aspect-ratio: 4/5; object-fit: cover; background: white; padding: 10px; }
+    .modal-copy { align-self: center; padding: 10px; }
+    .modal-copy h2 { margin: 12px 0 16px; font: 500 45px/.92 Georgia, serif; letter-spacing: -.06em; }
+    .modal-copy p { color: var(--muted); font: 16px/1.55 Georgia, serif; }
+    .modal-copy .modal-price { margin: 24px 0; color: var(--terracotta); font: 21px Georgia, serif; }
+    .close { position: absolute; top: 14px; right: 16px; border: 0; background: transparent; font-size: 24px; cursor: pointer; }
+    @media (max-width: 760px) {
+      .wrap { width: min(100% - 32px, 620px); }
+      header { height: 66px; } nav { gap: 12px; font-size: 9px; }
+      .hero { display: block; padding: 64px 0 80px; }
+      h1 { font-size: clamp(56px, 17vw, 86px); }
+      .hero-art { min-height: 390px; margin-top: 55px; }
+      .art-main { height: 350px; width: 76%; }
+      .art-side { height: 190px; }
+      .hero-art::after { right: 0; bottom: -6px; }
+      .section-head, .contact { display: block; }
+      .section-head p { margin-top: 18px; }
+      .grid { display: block; }
+      .card, .card:nth-child(2), .card:nth-child(4), .card:nth-child(5) { margin: 0 0 48px; }
+      .card-image { aspect-ratio: 1/1.14; }
+      .about { display: block; padding: 70px 0; }
+      .about-portrait { margin: 46px auto 42px; max-width: 320px; }
+      .about-copy { margin-top: 30px; }
+      .availability-key { grid-template-columns: max-content max-content; gap: 14px 20px; }
+      .availability-key .archive-note { grid-column: 1 / -1; }
+      .contact-links { margin-top: 32px; }
+      .modal { display: block; padding: 14px; }
+      .modal img { max-height: 62vh; }
+      .modal-copy { padding: 20px 6px 10px; }
+      footer { gap: 15px; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <a class="brand" href="#top"><span class="brand-mark"><img src="farida-logo.png" alt="Farida Ibrahim logo" /></span> Farida Ibrahim</a>
+    <nav><a href="#works">Works</a><a href="#about">About</a><a href="#contact">Connect</a></nav>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <div class="eyebrow">Artist / Mokattam, Cairo</div>
+        <h1>A city, held in colour.</h1>
+        <p>Paintings, drawings, and experiments by Farida Ibrahim — an evolving record of memory, material, and everyday life in Egypt.</p>
+        <div class="hero-actions"><a class="button primary" href="#works">Explore the works <span style="margin-left:12px">↘</span></a></div>
+      </div>
+      <div class="hero-art" aria-label="Featured artwork preview">
+        <div class="tape"></div><div class="scribble"></div>
+        <img class="art-main" src="https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=1000&q=85" alt="Abstract painting in warm colors" />
+        <img class="art-side" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=600&q=85" alt="Abstract artwork detail" />
+      </div>
+    </section>
+
+    <section class="works wrap" id="works">
+      <div class="section-head"><div><div class="eyebrow">Selected works</div><h2>An archive of looking twice.</h2></div></div>
+      <div class="filters" role="group" aria-label="Filter portfolio works"><button class="filter active" data-filter="all">All works</button><button class="filter" data-filter="available">Available</button><button class="filter" data-filter="sold">Sold</button></div>
+      <div class="availability-key" aria-label="Availability legend"><span><i></i> Available — inquire</span><span><i class="sold-dot"></i> Sold — archive</span><span class="archive-note">5 works / 4 available</span></div>
+      <div class="grid">
+        <article class="card" tabindex="0" role="button" data-type="painting" data-availability="available" data-title="After the Call to Prayer" data-meta="2026 · Acrylic & charcoal · 80 × 100 cm" data-price="EGP 32,000" data-status="AVAILABLE · INQUIRE" data-description="A slow study in blue hour, made after the city quiets. The surface holds scraped pigment, graphite, and a single terracotta mark."><img class="card-image" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=900&q=85" alt="After the Call to Prayer abstract artwork"/><div class="card-meta"><div><h3>After the Call<br/>to Prayer</h3><div class="details">2026 · acrylic & charcoal<br/>80 × 100 cm</div><span class="status available"><i></i>Available · inquire</span></div><span class="price">EGP 32,000</span></div></article>
+        <article class="card" tabindex="0" role="button" data-type="drawing" data-availability="available" data-title="Streetlight Studies" data-meta="2025 · Ink & gouache · 42 × 59 cm" data-price="EGP 14,500" data-status="AVAILABLE · INQUIRE" data-description="Three imagined street corners, drawn from memory. Each line is a small attempt to hold onto the feeling of walking home in late summer."><img class="card-image" src="https://images.unsplash.com/photo-1577083288073-40892c0860a4?auto=format&fit=crop&w=900&q=85" alt="Streetlight Studies abstract artwork"/><div class="card-meta"><div><h3>Streetlight<br/>Studies</h3><div class="details">2025 · ink & gouache<br/>42 × 59 cm</div><span class="status available"><i></i>Available · inquire</span></div><span class="price">EGP 14,500</span></div></article>
+        <article class="card" tabindex="0" role="button" data-type="painting" data-availability="sold" data-title="Nile, 6:14 AM" data-meta="2025 · Oil on canvas · 90 × 120 cm" data-price="EGP 41,000" data-status="SOLD · ARCHIVE" data-description="A horizon without a landmark. This work is about the few minutes before the city fully wakes, when the river feels like a private room."><img class="card-image" src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=900&q=85" alt="Nile, 6:14 AM abstract artwork"/><div class="card-meta"><div><h3>Nile,<br/>6:14 AM</h3><div class="details">2025 · oil on canvas<br/>90 × 120 cm</div><span class="status sold"><i></i>Sold · archive</span></div><span class="price">EGP 41,000</span></div></article>
+        <article class="card" tabindex="0" role="button" data-type="drawing" data-availability="available" data-title="Small Weather" data-meta="2024 · Graphite & pastel · 29 × 42 cm" data-price="EGP 8,500" data-status="AVAILABLE · INQUIRE" data-description="A pocket-sized record of dust, wind, and bright surfaces. On paper, the weather becomes a set of marks rather than a forecast."><img class="card-image" src="https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=900&q=85" alt="Small Weather abstract artwork"/><div class="card-meta"><div><h3>Small<br/>Weather</h3><div class="details">2024 · graphite & pastel<br/>29 × 42 cm</div><span class="status available"><i></i>Available · inquire</span></div><span class="price">EGP 8,500</span></div></article>
+        <article class="card" tabindex="0" role="button" data-type="painting" data-availability="available" data-title="Things Kept in Sunlight" data-meta="2026 · Mixed media on linen · 70 × 70 cm" data-price="EGP 27,000" data-status="AVAILABLE · INQUIRE" data-description="A square painting about the objects we keep close: a key, a cup, a folded note, and the light that changes them all."><img class="card-image" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=900&q=85" alt="Things Kept in Sunlight abstract artwork"/><div class="card-meta"><div><h3>Things Kept<br/>in Sunlight</h3><div class="details">2026 · mixed media<br/>70 × 70 cm</div><span class="status available"><i></i>Available · inquire</span></div><span class="price">EGP 27,000</span></div></article>
+      </div>
+    </section>
+
+    <section class="about wrap" id="about">
+      <div><div class="eyebrow">About the artist / Mokattam, Cairo</div><h2>A practice built from looking twice.</h2></div>
+      <figure class="about-portrait"><img src="farida-portrait.jpg" alt="Portrait of Farida Ibrahim" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"/><div class="portrait-placeholder" style="display:none">Farida Ibrahim<br/>portrait</div><figcaption>Farida / in front of one of her works</figcaption></figure>
+      <div class="about-copy"><p>Farida Ibrahim is a Cairo, Egypt-based artist. Born on October 28, 1996, she studied fine arts in the painting department at Helwan University.</p><p>Farida has participated in 15 group exhibitions in different cities across Egypt. She has also taken part in recycling projects for sustainable art and human development initiatives, and volunteered as an art trainer for orphan children through the Ministry of Youth and Sports.</p><p style="color:var(--terracotta); font-style:italic;">Every work begins with looking. Some observations become places.</p></div>
+    </section>
+
+    <section class="contact wrap" id="contact"><div><div class="eyebrow">Portfolio inquiries / Cairo, Egypt</div><h2>Let’s find the right work for your wall.</h2></div><div class="contact-links"><a class="contact-link" href="mailto:farida.ibrahim.art@example.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5"></rect><path d="m4 7 8 6 8-6"></path></svg>Email Farida ↗</a><a class="contact-link" href="https://instagram.com/farida_ibrahim10" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"></rect><circle cx="12" cy="12" r="3.5"></circle><circle cx="17.3" cy="6.8" r=".8" fill="currentColor" stroke="none"></circle></svg>@farida_ibrahim10 ↗</a><a class="contact-link" href="https://wa.me/201123795600" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-11.7 7.1L4 20l1.5-4.1A8 8 0 1 1 20 11.5Z"></path><path d="M9 8.5c.2 1.8 2.5 4.3 4.5 5.1.7.3 1.2-.1 1.7-.8l.5-.7-1.9-1.2-.8.9c-.8-.3-1.7-1.2-2.1-2l.8-.8-1.1-1.8-.7.2c-.6.2-.9.6-.9 1.1Z"></path></svg>WhatsApp · 011 237 95600 ↗</a></div></section>
+  </main>
+  <footer class="wrap"><span>© 2026 Farida Ibrahim</span><span>Portfolio / Made in Cairo</span></footer>
+
+  <dialog id="workDialog"><button class="close" aria-label="Close artwork details">×</button><div class="modal"><img id="modalImage" alt=""/><div class="modal-copy"><div class="eyebrow" id="modalStatus"></div><h2 id="modalTitle"></h2><p id="modalMeta"></p><p id="modalDescription" style="margin-top:20px"></p><div class="modal-price" id="modalPrice"></div><a class="button primary" id="modalInquiry" href="mailto:farida.ibrahim.art@example.com">Inquire about this work ↗</a></div></div></dialog>
+  <script>
+    const dialog = document.querySelector('#workDialog');
+    const cards = [...document.querySelectorAll('.card')];
+    const openCard = card => {
+      document.querySelector('#modalImage').src = card.querySelector('img').src;
+      document.querySelector('#modalImage').alt = card.querySelector('img').alt;
+      document.querySelector('#modalTitle').textContent = card.dataset.title;
+      document.querySelector('#modalMeta').textContent = card.dataset.meta;
+      document.querySelector('#modalPrice').textContent = card.dataset.price;
+      document.querySelector('#modalStatus').textContent = card.dataset.status;
+      document.querySelector('#modalDescription').textContent = card.dataset.description;
+      document.querySelector('#modalInquiry').href = 'mailto:farida.ibrahim.art@example.com?subject=' + encodeURIComponent('Inquiry: ' + card.dataset.title);
+      dialog.showModal();
+    };
+    cards.forEach(card => { card.addEventListener('click', () => openCard(card)); card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openCard(card); } }); });
+    document.querySelector('.close').addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', e => { if (e.target === dialog) dialog.close(); });
+    document.querySelectorAll('.filter').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll('.filter').forEach(b => b.classList.remove('active')); button.classList.add('active');
+      cards.forEach(card => { const filter = button.dataset.filter; const matches = filter === 'all' || card.dataset.type === filter || card.dataset.availability === filter; card.style.display = matches ? '' : 'none'; });
+    }));
+  </script>
+</body>
+</html>

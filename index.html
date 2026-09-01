@@ -21,6 +21,8 @@
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
+      position: relative;
+      isolation: isolate;
       color: var(--ink);
       background: var(--paper);
       font-family: Arial, Helvetica, sans-serif;
@@ -33,6 +35,8 @@
       background: repeating-linear-gradient(0deg, transparent 0 5px, rgba(98,77,48,.06) 6px 7px);
       mix-blend-mode: multiply;
     }
+    #pagePaintCanvas { position: absolute; z-index: 0; inset: 0 auto auto 0; display: block; width: 100%; pointer-events: none; opacity: .68; mix-blend-mode: multiply; }
+    main, footer { position: relative; z-index: 1; }
     a { color: inherit; text-decoration: none; }
     .wrap { width: min(1180px, calc(100% - 48px)); margin: auto; }
     header {
@@ -155,6 +159,7 @@
   </style>
 </head>
 <body>
+  <canvas id="pagePaintCanvas" aria-hidden="true"></canvas>
   <header class="wrap">
     <a class="brand" href="#top"><span class="brand-mark"><img src="farida-logo.png" alt="Farida Ibrahim logo" /></span> Farida Ibrahim</a>
     <nav><a href="#works">Works</a><a href="#about">About</a><a href="#contact">Connect</a></nav>
@@ -200,6 +205,462 @@
 
   <dialog id="workDialog"><button class="close" aria-label="Close artwork details">×</button><div class="modal"><img id="modalImage" alt=""/><div class="modal-copy"><div class="eyebrow" id="modalStatus"></div><h2 id="modalTitle"></h2><p id="modalMeta"></p><p id="modalDescription" style="margin-top:20px"></p><div class="modal-price" id="modalPrice"></div><a class="button primary" id="modalInquiry" href="mailto:farida.ibrahim.art@example.com">Inquire about this work ↗</a></div></div></dialog>
   <script>
+    /*
+      LEGACY CONNECTED-DRIP ANIMATION
+      Preserved for comparison and easy restoration, as requested.
+      The false guard disables it without deleting the earlier implementation.
+    */
+    if (false) {
+    /* Paint-drip controls — tune these seven values to change the effect. */
+    const PAINT_DRIP_COLORS = ['#7b22b9', '#d52a8a', '#435fce', '#4b185f', '#526e78'];
+    const PAINT_DRIP_COUNT = 6;
+    const PAINT_DRIP_SPEED = 0.5;
+    const PAINT_DRIP_OPACITY = .6; // 0 = invisible, 1 = fully opaque
+    const PAINT_DRIP_AREA_START = .74; // .62 confines drips to the rightmost 38%
+    const PAINT_DRIP_END_SELECTOR = '#about'; // Stop at “See what the colour is saying.”
+
+    const pagePaintCanvas = document.querySelector('#pagePaintCanvas');
+    if (pagePaintCanvas) {
+      pagePaintCanvas.style.opacity = String(Math.max(0, Math.min(1, PAINT_DRIP_OPACITY)));
+      const pagePaintContext = pagePaintCanvas.getContext('2d', { alpha: true });
+      const reducedPaintMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let pagePaintWidth = 0;
+      let pagePaintHeight = 0;
+      let pagePaintRatio = 1;
+      let pagePaintDrips = [];
+      let pagePaintFrame = 0;
+      let pagePaintStart = 0;
+      let pagePaintResizeTimer = 0;
+      let pagePaintResetTimer = 0;
+
+      const paintClamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value));
+      const paintRgba = (hex, alpha) => {
+        const number = Number.parseInt(hex.replace('#', ''), 16);
+        return `rgba(${number >> 16}, ${(number >> 8) & 255}, ${number & 255}, ${alpha})`;
+      };
+      const paintShade = (hex, amount) => {
+        const number = Number.parseInt(hex.replace('#', ''), 16);
+        const red = paintClamp((number >> 16) + amount, 0, 255);
+        const green = paintClamp(((number >> 8) & 255) + amount, 0, 255);
+        const blue = paintClamp((number & 255) + amount, 0, 255);
+        return `#${((1 << 24) + (red << 16) + (green << 8) + blue).toString(16).slice(1)}`;
+      };
+
+      /* Accelerates like gravity, then makes a very small settling bounce. */
+      const paintGravityEase = progress => {
+        if (progress < .86) {
+          const falling = progress / .86;
+          return .96 * falling * falling;
+        }
+        const settling = (progress - .86) / .14;
+        const bounce = Math.sin(settling * Math.PI * 2) * .012 * (1 - settling);
+        return paintClamp(.96 + .04 * (1 - Math.pow(1 - settling, 3)) + bounce, 0, 1);
+      };
+
+      const createPagePaintDrips = () => {
+        const paintAreaStart = pagePaintWidth * paintClamp(PAINT_DRIP_AREA_START, 0, .98);
+        const paintAreaWidth = pagePaintWidth - paintAreaStart;
+        const spacing = paintAreaWidth / PAINT_DRIP_COUNT;
+        pagePaintDrips = Array.from({ length: PAINT_DRIP_COUNT }, (_, index) => {
+          const width = 3 + Math.random() * 5;
+          return {
+            x: paintAreaStart + spacing * (index + .5) + (Math.random() - .5) * spacing * .62,
+            width,
+            color: PAINT_DRIP_COLORS[index % PAINT_DRIP_COLORS.length],
+            delay: Math.random() * 1900,
+            duration: (7000 + Math.random() * 4600) / Math.max(.1, PAINT_DRIP_SPEED),
+            phaseA: Math.random() * Math.PI * 2,
+            phaseB: Math.random() * Math.PI * 2,
+            waveA: .7 + Math.random() * 1.35,
+            waveB: .25 + Math.random() * .7,
+            frequencyA: .008 + Math.random() * .008,
+            frequencyB: .021 + Math.random() * .016,
+            bulbWidth: width * (1.55 + Math.random() * .45),
+            bulbHeight: width * (2.05 + Math.random() * .7),
+            detached: Math.random() < .42,
+            detachAt: .48 + Math.random() * .25
+          };
+        });
+      };
+
+      const pagePaintX = (drip, y) => drip.x
+        + Math.sin(y * drip.frequencyA + drip.phaseA) * drip.waveA
+        + Math.sin(y * drip.frequencyB + drip.phaseB) * drip.waveB;
+
+      const drawPaintTrail = (drip, tipY) => {
+        const gradient = pagePaintContext.createLinearGradient(drip.x - drip.width, 0, drip.x + drip.width, 0);
+        gradient.addColorStop(0, paintShade(drip.color, -24));
+        gradient.addColorStop(.38, drip.color);
+        gradient.addColorStop(.58, paintRgba('#ffffff', .52));
+        gradient.addColorStop(.72, drip.color);
+        gradient.addColorStop(1, paintShade(drip.color, -30));
+
+        pagePaintContext.lineCap = 'round';
+        pagePaintContext.lineJoin = 'round';
+        pagePaintContext.strokeStyle = gradient;
+        pagePaintContext.lineWidth = drip.width;
+        pagePaintContext.beginPath();
+        pagePaintContext.moveTo(pagePaintX(drip, 0), 0);
+        for (let y = 18; y < tipY; y += 34) pagePaintContext.lineTo(pagePaintX(drip, y), y);
+        pagePaintContext.lineTo(pagePaintX(drip, tipY), tipY);
+        pagePaintContext.stroke();
+
+        /* Narrow wet highlight running down the centre of the trail. */
+        pagePaintContext.strokeStyle = paintRgba('#ffffff', .34);
+        pagePaintContext.lineWidth = Math.max(.65, drip.width * .16);
+        pagePaintContext.beginPath();
+        pagePaintContext.moveTo(pagePaintX(drip, 0) - drip.width * .12, 0);
+        for (let y = 22; y < tipY; y += 38) pagePaintContext.lineTo(pagePaintX(drip, y) - drip.width * .12, y);
+        pagePaintContext.lineTo(pagePaintX(drip, tipY) - drip.width * .12, tipY);
+        pagePaintContext.stroke();
+      };
+
+      const drawPaintBulb = (drip, tipY, alpha = 1, scale = 1) => {
+        const x = pagePaintX(drip, tipY);
+        const width = drip.bulbWidth * scale;
+        const height = drip.bulbHeight * scale;
+        const bulbGradient = pagePaintContext.createLinearGradient(x - width, tipY - height, x + width, tipY + height);
+        bulbGradient.addColorStop(0, paintRgba('#ffffff', .42 * alpha));
+        bulbGradient.addColorStop(.28, paintRgba(drip.color, alpha));
+        bulbGradient.addColorStop(1, paintRgba(paintShade(drip.color, -34), alpha));
+        pagePaintContext.fillStyle = bulbGradient;
+        pagePaintContext.beginPath();
+        pagePaintContext.moveTo(x, tipY - height * .72);
+        pagePaintContext.bezierCurveTo(x + width * .62, tipY - height * .34, x + width * .68, tipY + height * .28, x, tipY + height * .55);
+        pagePaintContext.bezierCurveTo(x - width * .68, tipY + height * .28, x - width * .62, tipY - height * .34, x, tipY - height * .72);
+        pagePaintContext.closePath();
+        pagePaintContext.fill();
+      };
+
+      const drawDetachedDroplet = (drip, progress, tipY) => {
+        if (!drip.detached || progress <= drip.detachAt || progress >= .97) return;
+        const local = (progress - drip.detachAt) / (.97 - drip.detachAt);
+        const distance = 12 + local * 72;
+        const alpha = Math.sin(local * Math.PI) * .72;
+        drawPaintBulb(drip, Math.min(pagePaintHeight - 8, tipY + distance), alpha, .48);
+      };
+
+      const drawPagePaint = time => {
+        pagePaintContext.clearRect(0, 0, pagePaintWidth, pagePaintHeight);
+        let complete = true;
+        pagePaintDrips.forEach(drip => {
+          const elapsed = Math.max(0, time - pagePaintStart - drip.delay);
+          const progress = paintClamp(elapsed / drip.duration, 0, 1);
+          if (progress < 1) complete = false;
+          const tipY = paintGravityEase(progress) * (pagePaintHeight - drip.bulbHeight - 3);
+          if (progress > 0) {
+            drawPaintTrail(drip, tipY);
+            drawPaintBulb(drip, tipY);
+            drawDetachedDroplet(drip, progress, tipY);
+          }
+        });
+        if (!complete && !document.hidden && !reducedPaintMotion.matches) {
+          pagePaintFrame = requestAnimationFrame(drawPagePaint);
+        } else if (complete && !reducedPaintMotion.matches) {
+          clearTimeout(pagePaintResetTimer);
+          pagePaintResetTimer = setTimeout(() => {
+            if (document.hidden || reducedPaintMotion.matches) return;
+            createPagePaintDrips();
+            pagePaintStart = performance.now();
+            pagePaintContext.clearRect(0, 0, pagePaintWidth, pagePaintHeight);
+            pagePaintFrame = requestAnimationFrame(drawPagePaint);
+          }, PAINT_DRIP_RESET_DELAY);
+        }
+      };
+
+      const sizePagePaintCanvas = () => {
+        pagePaintWidth = Math.max(1, document.documentElement.clientWidth);
+        const paintEndTarget = document.querySelector(PAINT_DRIP_END_SELECTOR);
+        const paintEndPosition = paintEndTarget
+          ? paintEndTarget.getBoundingClientRect().top + window.scrollY
+          : document.documentElement.scrollHeight;
+        pagePaintHeight = Math.max(1, paintEndPosition);
+        const pixelBudgetRatio = Math.sqrt(14000000 / (pagePaintWidth * pagePaintHeight));
+        pagePaintRatio = Math.max(.75, Math.min(window.devicePixelRatio || 1, 1.5, pixelBudgetRatio));
+        pagePaintCanvas.width = Math.round(pagePaintWidth * pagePaintRatio);
+        pagePaintCanvas.height = Math.round(pagePaintHeight * pagePaintRatio);
+        pagePaintCanvas.style.height = `${pagePaintHeight}px`;
+        pagePaintContext.setTransform(pagePaintRatio, 0, 0, pagePaintRatio, 0, 0);
+        createPagePaintDrips();
+        pagePaintStart = performance.now();
+        cancelAnimationFrame(pagePaintFrame);
+        clearTimeout(pagePaintResetTimer);
+        if (reducedPaintMotion.matches) drawPagePaint(pagePaintStart + 16000 / Math.max(.1, PAINT_DRIP_SPEED));
+        else pagePaintFrame = requestAnimationFrame(drawPagePaint);
+      };
+
+      const initialisePagePaint = () => sizePagePaintCanvas();
+      if (document.readyState === 'complete') initialisePagePaint();
+      else window.addEventListener('load', initialisePagePaint, { once: true });
+      window.addEventListener('resize', () => {
+        clearTimeout(pagePaintResizeTimer);
+        pagePaintResizeTimer = setTimeout(sizePagePaintCanvas, 180);
+      }, { passive: true });
+      reducedPaintMotion.addEventListener('change', sizePagePaintCanvas);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && !reducedPaintMotion.matches) {
+          cancelAnimationFrame(pagePaintFrame);
+          pagePaintFrame = requestAnimationFrame(drawPagePaint);
+        }
+      });
+    }
+    }
+
+    /*
+      INDIVIDUAL FALLING PAINT-DROP CONTROLS
+      Change these values only; the animation logic below does not need editing.
+    */
+    const PAINT_DROP_CONFIG = {
+  colors: ['#7b22b9', '#d52a8a', '#435fce', '#4b185f', '#526e78'],
+
+  // Duration in milliseconds. Lower numbers fall faster.
+  // Raised because drops now travel the FULL page height (was tuned for a 55% fall).
+  // speed: { minDuration: 7000, maxDuration: 16000 }, // (old) too fast for full-height travel
+  speed: { minDuration: 10000, maxDuration: 24000 },
+
+  opacity: { min: .5, max: .6 },
+
+  // Lowered — full-height drops stay visible roughly 2x longer than before,
+  // so the same density value now looks noticeably more crowded on screen.
+  // density: 65, // (old)
+  density: 40,
+
+  size: { min: 6, max: 12 },
+
+  placement: {
+    mode: 'right',
+    customRanges: [[0, 1]],
+    edgeWidth: .4
+  },
+
+  // Small variance on restart keeps the stream from ever looking like it's
+  // pulsing in sync, now that drops restart immediately (spawnDelay was 0-0).
+  // spawnDelay: { min: 0, max: 0 }, // (old) caused perfectly instant, uniform restarts
+  spawnDelay: { min: 0, max: 500 },
+
+  // Wider gap between drops entering the initial stream, since each drop's
+  // lifespan is now much longer (full document height vs. 55%).
+  // entryInterval: 35, // (old)
+  entryInterval: 90,
+
+  // Already correct: 1 = drop completes the full fall to endY (bottom of the
+  // document) before resetting. This is what makes it read as a waterfall
+  // instead of drops vanishing mid-air.
+  restartProgress: 1,
+
+  faintTrailChance: .12,
+  splitDropChance: .08
+    };
+
+    const paintDropCanvas = document.querySelector('#pagePaintCanvas');
+    if (paintDropCanvas) {
+      paintDropCanvas.style.opacity = '1';
+      const paintDropContext = paintDropCanvas.getContext('2d', { alpha: true });
+      const paintDropReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let paintDropWidth = 1;
+      let paintDropHeight = 1;
+      let paintDropRatio = 1;
+      let paintDrops = [];
+      let paintDropFrame = 0;
+      let paintDropResizeTimer = 0;
+      let paintDropColorCursor = 0;
+
+      const dropClamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value));
+      const dropRandom = (minimum, maximum) => minimum + Math.random() * (maximum - minimum);
+      const dropRgba = (hex, alpha) => {
+        const number = Number.parseInt(hex.replace('#', ''), 16);
+        return `rgba(${number >> 16}, ${(number >> 8) & 255}, ${number & 255}, ${alpha})`;
+      };
+
+      const paintDropRange = () => {
+        const { mode, customRanges, edgeWidth } = PAINT_DROP_CONFIG.placement;
+        const edge = dropClamp(edgeWidth, .02, .48);
+        if (mode === 'left') return [0, edge];
+        if (mode === 'right') return [1 - edge, 1];
+        if (mode === 'center') return [.32, .68];
+        if (mode === 'edges') return Math.random() < .5 ? [0, edge] : [1 - edge, 1];
+        if (mode === 'custom' && customRanges.length) {
+          return customRanges[Math.floor(Math.random() * customRanges.length)];
+        }
+        return [0, 1];
+      };
+
+      const nextPaintDropColor = () => {
+        const colors = PAINT_DROP_CONFIG.colors;
+        const color = colors[paintDropColorCursor % colors.length];
+        paintDropColorCursor += 1;
+        return color;
+      };
+
+      const resetPaintDrop = (drop, initial = false, entryOffset = 0) => {
+        const range = paintDropRange();
+        const minimumX = dropClamp(Math.min(range[0], range[1]), 0, 1);
+        const maximumX = dropClamp(Math.max(range[0], range[1]), 0, 1);
+        drop.size = dropRandom(PAINT_DROP_CONFIG.size.min, PAINT_DROP_CONFIG.size.max);
+        drop.x = dropRandom(minimumX, maximumX) * paintDropWidth;
+        drop.startY = -drop.size * 2.2;
+        drop.endY = paintDropHeight - drop.size * .8;
+        drop.duration = dropRandom(PAINT_DROP_CONFIG.speed.minDuration, PAINT_DROP_CONFIG.speed.maxDuration);
+        drop.delay = initial
+          ? entryOffset + dropRandom(0, PAINT_DROP_CONFIG.spawnDelay.max)
+          : dropRandom(PAINT_DROP_CONFIG.spawnDelay.min, PAINT_DROP_CONFIG.spawnDelay.max);
+        drop.startedAt = performance.now() + drop.delay;
+        drop.opacity = dropRandom(PAINT_DROP_CONFIG.opacity.min, PAINT_DROP_CONFIG.opacity.max);
+        drop.color = nextPaintDropColor();
+        drop.tilt = dropRandom(-.28, .28);
+        drop.wobble = dropRandom(.3, 1.4);
+        drop.phase = dropRandom(0, Math.PI * 2);
+        drop.shapeA = dropRandom(.82, 1.12);
+        drop.shapeB = dropRandom(.84, 1.16);
+        drop.hasTrail = Math.random() < PAINT_DROP_CONFIG.faintTrailChance;
+        drop.trailScale = dropRandom(1.2, 2.2);
+        drop.hasSplit = Math.random() < PAINT_DROP_CONFIG.splitDropChance;
+        drop.splitSide = Math.random() < .5 ? -1 : 1;
+      };
+
+      const createPaintDrops = () => {
+        paintDrops = Array.from({ length: Math.max(1, PAINT_DROP_CONFIG.density) }, (_, index) => {
+          const drop = {};
+          resetPaintDrop(drop, true, index * PAINT_DROP_CONFIG.entryInterval);
+          return drop;
+        });
+      };
+
+      const drawPaintDropShape = (drop, x, y, alpha, scaleX = 1, scaleY = 1) => {
+        const radius = drop.size * .5;
+        const width = radius * drop.shapeA * scaleX;
+        const height = radius * 1.38 * drop.shapeB * scaleY;
+        paintDropContext.save();
+        paintDropContext.translate(x, y);
+        paintDropContext.rotate(drop.tilt);
+
+        const fill = paintDropContext.createRadialGradient(-width * .28, -height * .34, .2, 0, 0, height * 1.25);
+        fill.addColorStop(0, dropRgba('#ffffff', alpha * .5));
+        fill.addColorStop(.2, dropRgba(drop.color, alpha));
+        fill.addColorStop(1, dropRgba(drop.color, alpha * .86));
+        paintDropContext.fillStyle = fill;
+        paintDropContext.beginPath();
+        paintDropContext.moveTo(0, -height);
+        paintDropContext.bezierCurveTo(
+          width * .26, -height * .5,
+          width * 1.08, -height * .08,
+          width * .9, height * .38
+        );
+        paintDropContext.bezierCurveTo(
+          width * .7, height * 1.05,
+          -width * .72, height * 1.08,
+          -width * .94, height * .3
+        );
+        paintDropContext.bezierCurveTo(
+          -width * 1.06, -height * .1,
+          -width * .22, -height * .56,
+          0, -height
+        );
+        paintDropContext.closePath();
+        paintDropContext.fill();
+
+        // Small wet highlight near the tapered top.
+        paintDropContext.fillStyle = dropRgba('#ffffff', alpha * .44);
+        paintDropContext.beginPath();
+        paintDropContext.ellipse(-width * .27, -height * .3, Math.max(.45, width * .16), Math.max(.7, height * .19), -.35, 0, Math.PI * 2);
+        paintDropContext.fill();
+        paintDropContext.restore();
+      };
+
+      const drawFaintDropTrail = (drop, x, y, alpha, velocity) => {
+        if (!drop.hasTrail || velocity < .42) return;
+        const trailLength = drop.size * drop.trailScale;
+        const trail = paintDropContext.createLinearGradient(x, y - trailLength, x, y);
+        trail.addColorStop(0, dropRgba(drop.color, 0));
+        trail.addColorStop(1, dropRgba(drop.color, alpha * .16));
+        paintDropContext.strokeStyle = trail;
+        paintDropContext.lineWidth = Math.max(.55, drop.size * .12);
+        paintDropContext.lineCap = 'round';
+        paintDropContext.beginPath();
+        paintDropContext.moveTo(x, y - trailLength);
+        paintDropContext.lineTo(x, y - drop.size * .7);
+        paintDropContext.stroke();
+      };
+
+      const drawSplitPaintDrop = (drop, x, y, alpha, progress) => {
+        if (!drop.hasSplit || progress < .38 || progress > .72) return;
+        const splitProgress = (progress - .38) / .34;
+        const splitDrop = {
+          ...drop,
+          size: drop.size * .34,
+          tilt: drop.tilt * -.5,
+          shapeA: 1,
+          shapeB: 1.05
+        };
+        const splitX = x + drop.splitSide * (drop.size * (.55 + splitProgress * 1.4));
+        const splitY = y - drop.size * (1.1 - splitProgress * .65);
+        drawPaintDropShape(splitDrop, splitX, splitY, alpha * Math.sin(splitProgress * Math.PI) * .72);
+      };
+
+      const drawFallingPaintDrops = time => {
+        paintDropContext.clearRect(0, 0, paintDropWidth, paintDropHeight);
+        paintDrops.forEach(drop => {
+          if (time < drop.startedAt) return;
+          const rawProgress = (time - drop.startedAt) / drop.duration;
+          // Previous bottom-only restart: if (rawProgress >= 1) { resetPaintDrop(drop); }
+          if (rawProgress >= PAINT_DROP_CONFIG.restartProgress) {
+            resetPaintDrop(drop);
+            return;
+          }
+
+          const progress = dropClamp(rawProgress, 0, 1);
+          const fallingProgress = Math.min(progress / .92, 1);
+          const gravityProgress = fallingProgress * fallingProgress;
+          const landingProgress = progress > .92 ? (progress - .92) / .08 : 0;
+          const fadeIn = dropClamp(progress / .035, 0, 1);
+          const fadeOut = progress > .9 ? 1 - ((progress - .9) / .1) : 1;
+          const alpha = drop.opacity * fadeIn * dropClamp(fadeOut, 0, 1);
+          const squash = Math.sin(landingProgress * Math.PI) * .22;
+          const x = drop.x + Math.sin(progress * Math.PI * 3 + drop.phase) * drop.wobble;
+          const y = drop.startY + (drop.endY - drop.startY) * gravityProgress;
+
+          drawFaintDropTrail(drop, x, y, alpha, fallingProgress);
+          drawPaintDropShape(drop, x, y, alpha, 1 + squash, 1 - squash * .7);
+          drawSplitPaintDrop(drop, x, y, alpha, progress);
+        });
+        if (!document.hidden && !paintDropReducedMotion.matches) {
+          paintDropFrame = requestAnimationFrame(drawFallingPaintDrops);
+        }
+      };
+
+      const sizePaintDropCanvas = () => {
+        paintDropWidth = Math.max(1, document.documentElement.clientWidth);
+        paintDropHeight = Math.max(1, document.documentElement.scrollHeight);
+        const pixelBudgetRatio = Math.sqrt(14000000 / (paintDropWidth * paintDropHeight));
+        paintDropRatio = Math.max(.75, Math.min(window.devicePixelRatio || 1, 1.5, pixelBudgetRatio));
+        paintDropCanvas.width = Math.round(paintDropWidth * paintDropRatio);
+        paintDropCanvas.height = Math.round(paintDropHeight * paintDropRatio);
+        paintDropCanvas.style.height = `${paintDropHeight}px`;
+        paintDropContext.setTransform(paintDropRatio, 0, 0, paintDropRatio, 0, 0);
+        cancelAnimationFrame(paintDropFrame);
+        paintDropContext.clearRect(0, 0, paintDropWidth, paintDropHeight);
+        if (!paintDropReducedMotion.matches) {
+          createPaintDrops();
+          paintDropFrame = requestAnimationFrame(drawFallingPaintDrops);
+        }
+      };
+
+      const initialisePaintDrops = () => sizePaintDropCanvas();
+      if (document.readyState === 'complete') initialisePaintDrops();
+      else window.addEventListener('load', initialisePaintDrops, { once: true });
+      window.addEventListener('resize', () => {
+        clearTimeout(paintDropResizeTimer);
+        paintDropResizeTimer = setTimeout(sizePaintDropCanvas, 180);
+      }, { passive: true });
+      paintDropReducedMotion.addEventListener('change', sizePaintDropCanvas);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && !paintDropReducedMotion.matches) {
+          cancelAnimationFrame(paintDropFrame);
+          paintDropFrame = requestAnimationFrame(drawFallingPaintDrops);
+        }
+      });
+    }
+
     const dialog = document.querySelector('#workDialog');
     const cards = [...document.querySelectorAll('.card')];
     const heroArt = document.querySelector('.hero-art');
